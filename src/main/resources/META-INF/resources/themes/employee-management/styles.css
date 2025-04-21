@@ -1,0 +1,32 @@
+/* Main Layout styles */
+.employee-management {
+    --lumo-primary-color: #1976d2;
+    --lumo-primary-text-color: #1976d2;
+    --lumo-primary-color-50pct: rgba(25, 118, 210, 0.5);
+    --lumo-primary-color-10pct: rgba(25, 118, 210, 0.1);
+}
+
+/* Employee List View styles */
+.list-view {
+    padding: var(--lumo-space-m);
+}
+
+.list-view .toolbar {
+    margin-bottom: var(--lumo-space-m);
+}
+
+.list-view .content {
+    height: 100%;
+}
+
+.list-view .employee-grid {
+    height: 100%;
+}
+
+/* Employee Form styles */
+.employee-form {
+    padding: var(--lumo-space-m);
+    border-radius: var(--lumo-border-radius);
+    background-color: var(--lumo-base-color);
+    box-shadow: var(--lumo-box-shadow-s);
+}

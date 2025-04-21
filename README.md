@@ -1,0 +1,280 @@
+# Employee Service
+
+A Spring Boot 3.4 application for managing employee data with a Vaadin-based web UI.
+
+## Project Structure
+
+```
+employee-service/
+├── frontend/                          # Frontend resources for Vaadin
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/
+│   │   │       └── saeed/
+│   │   │           ├── controller/
+│   │   │           │   └── EmployeeController.java
+│   │   │           ├── model/
+│   │   │           │   └── Employee.java
+│   │   │           ├── repository/
+│   │   │           │   ├── EmployeeRepository.java
+│   │   │           │   └── JdbcEmployeeRepository.java
+│   │   │           ├── service/
+│   │   │           │   └── EmployeeService.java
+│   │   │           ├── ui/
+│   │   │           │   ├── EmployeeForm.java
+│   │   │           │   ├── EmployeeListView.java
+│   │   │           │   └── MainLayout.java
+│   │   │           └── Main.java
+│   │   └── resources/
+│   │       ├── META-INF/resources/themes/
+│   │       │   └── employee-management/
+│   │       │       ├── styles.css
+│   │       │       └── theme.json
+│   │       ├── application.properties
+│   │       └── schema.sql
+│   └── test/
+│       └── java/
+│           └── com/
+│               └── saeed/
+│                   ├── controller/
+│                   │   └── EmployeeControllerTest.java
+│                   ├── repository/
+│                   │   └── JdbcEmployeeRepositoryTest.java
+│                   └── service/
+│                       └── EmployeeServiceTest.java
+├── docker-compose.yml
+├── package.json                       # Frontend dependencies
+├── pom.xml                            # Backend dependencies
+├── tsconfig.json                      # TypeScript configuration
+├── vite.config.ts                     # Vite build configuration
+└── other frontend configuration files
+```
+
+## Technologies Used
+
+- Spring Boot 3.4.0
+- Java 17
+- Maven
+- PostgreSQL 16 (in Docker setup)
+- Docker and Docker Compose (for containerized database)
+- Spring Boot Docker Compose (for automatic Docker Compose integration)
+- Vaadin Flow 24.3.5/24.3.6 (for the web UI)
+- TypeScript
+- Vite (frontend build tool)
+- Testcontainers 1.19.7 (for integration testing)
+
+## Getting Started
+
+### Prerequisites
+
+- Java 17 or higher
+- Maven 3.6 or higher
+- Node.js and npm (for frontend development)
+- Docker and Docker Compose (recommended for the database setup)
+- PostgreSQL 16 (if not using Docker)
+
+### Database Setup
+
+#### Option 1: Using Docker with Spring Boot Docker Compose (Recommended)
+
+The project uses Spring Boot Docker Compose to automatically integrate with Docker Compose:
+
+1. Make sure Docker and Docker Compose are installed on your system
+2. Run the following command in the project root directory:
+
+```bash
+docker-compose up -d
+```
+
+3. This will start a PostgreSQL container with the following configuration:
+   - Database: employee_db
+   - Username: postgres
+   - Password: postgres
+   - Port: 5432
+
+4. When you start the application, Spring Boot Docker Compose will automatically:
+   - Detect the running Docker Compose services
+   - Configure the database connection properties
+   - Connect to the PostgreSQL container
+
+5. The application will automatically create the tables and insert initial data when it starts.
+
+#### Option 2: Manual PostgreSQL Setup
+
+If you prefer to use an existing PostgreSQL installation:
+
+1. Install PostgreSQL if not already installed:
+   - **Ubuntu/Debian**: `sudo apt-get install postgresql postgresql-contrib`
+   - **macOS**: `brew install postgresql`
+   - **Windows**: Download and install from [PostgreSQL website](https://www.postgresql.org/download/windows/)
+
+2. Start the PostgreSQL service:
+   - **Ubuntu/Debian**: `sudo service postgresql start`
+   - **macOS**: `brew services start postgresql`
+   - **Windows**: PostgreSQL is installed as a service and should start automatically
+
+3. Create the database:
+   ```bash
+   sudo -u postgres psql
+   CREATE DATABASE employee_db;
+   \q
+   ```
+
+4. The application will automatically create the tables and insert initial data when it starts.
+
+5. Configure the application (if needed):
+   - The default configuration assumes PostgreSQL is running on localhost:5432 with username 'postgres' and password 'postgres'
+   - If your setup is different, update the `src/main/resources/application.properties` file:
+     ```properties
+     spring.datasource.url=jdbc:postgresql://localhost:5432/employee_db
+     spring.datasource.username=postgres
+     spring.datasource.password=postgres
+     ```
+
+### Building the Application
+
+```bash
+mvn clean install
+```
+
+### Running the Application
+
+```bash
+mvn spring-boot:run
+```
+
+Or after building:
+
+```bash
+java -jar target/employee-service-0.0.1-SNAPSHOT.jar
+```
+
+### Verifying the Setup
+
+After starting the application, you can verify that it's correctly connected to the PostgreSQL database:
+
+1. Check the application logs for successful database initialization:
+   ```
+   INFO ... - Executing SQL script from class path resource [schema.sql]
+   ```
+
+2. Make a request to the API to retrieve employees:
+   ```bash
+   curl -X GET http://localhost:8080/api/employees
+   ```
+
+   You should see the initial data that was inserted by schema.sql.
+
+3. If you want to directly check the database:
+   ```bash
+   # For local PostgreSQL
+   psql -U postgres -d employee_db -c "SELECT * FROM employees;"
+
+   # For Docker PostgreSQL
+   docker exec -it employee-postgres psql -U postgres -d employee_db -c "SELECT * FROM employees;"
+   ```
+
+## User Interface
+
+The application provides a web-based user interface built with Vaadin Flow. The UI allows you to:
+
+- View a list of all employees
+- Filter employees by name, email, or department
+- Add new employees
+- Edit existing employees
+- Delete employees
+
+### Running the Application with Vaadin UI
+
+To run the application with the Vaadin UI:
+
+1. Make sure the database is set up (see Database Setup section above)
+2. Build the application:
+   ```bash
+   mvn clean install
+   ```
+3. Run the application:
+   ```bash
+   mvn spring-boot:run
+   ```
+4. Wait for the application to start completely. You should see a message like:
+   ```
+   Employee Service Application with Vaadin UI Started!
+   ```
+5. The first startup might take longer as Vaadin compiles the frontend resources
+
+### Accessing the UI
+
+Once the application is running, you can access the UI by opening a web browser and navigating to:
+
+```
+http://localhost:8080
+```
+
+### UI Features
+
+- **Employee List**: The main view displays a grid of all employees with their details.
+- **Filtering**: Use the search field to filter employees by any field.
+- **Add Employee**: Click the "Add Employee" button to create a new employee.
+- **Edit Employee**: Click on an employee in the grid to edit their details.
+- **Delete Employee**: When editing an employee, you can delete them using the Delete button.
+
+### Troubleshooting Vaadin UI Issues
+
+If you encounter issues with the Vaadin UI:
+
+1. **UI not loading**: Make sure the application is fully started. Check the console logs for any errors.
+2. **Blank page**: Try clearing your browser cache or opening in a private/incognito window.
+3. **Frontend compilation errors**: Delete the `node_modules` directory and the `package-lock.json` file, then restart the application.
+4. **Database connection issues**: Ensure your PostgreSQL database is running and accessible.
+5. **Development mode**: For faster development iterations, use:
+   ```bash
+   mvn spring-boot:run -Pproduction
+   ```
+
+## API Endpoints
+
+The application also provides a RESTful API for programmatic access:
+
+- `GET /api/employees` - Get all employees
+- `GET /api/employees/{id}` - Get employee by ID
+- `POST /api/employees` - Create a new employee
+- `PUT /api/employees/{id}` - Update an existing employee
+- `DELETE /api/employees/{id}` - Delete an employee
+
+## Sample Requests
+
+### Get All Employees
+
+```bash
+curl -X GET http://localhost:8080/api/employees
+```
+
+### Get Employee by ID
+
+```bash
+curl -X GET http://localhost:8080/api/employees/1
+```
+
+### Create Employee
+
+```bash
+curl -X POST http://localhost:8080/api/employees \
+  -H "Content-Type: application/json" \
+  -d '{"firstName":"Alice","lastName":"Johnson","email":"alice.johnson@example.com","department":"Marketing"}'
+```
+
+### Update Employee
+
+```bash
+curl -X PUT http://localhost:8080/api/employees/1 \
+  -H "Content-Type: application/json" \
+  -d '{"firstName":"John","lastName":"Smith","email":"john.smith@example.com","department":"Sales"}'
+```
+
+### Delete Employee
+
+```bash
+curl -X DELETE http://localhost:8080/api/employees/1
+```
